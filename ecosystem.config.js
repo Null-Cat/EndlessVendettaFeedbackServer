@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       // Name of app
-      name: 'CM_Lobby',
+      name: 'EV_Feedback',
       // Script for pm2 run forever
       // If use static website, remove it
       script: 'server.js',
@@ -13,11 +13,11 @@ module.exports = {
       // If use static website, remove it
       //args: 'one two',
       // Current directory on server
-      cwd: '/var/www/cm-lobby/current',
+      cwd: '/var/www/ev-feed/current',
       // Config out file for web errors
-      error_file: '/var/www/cm-lobby/logs/web.err.log',
+      error_file: '/var/www/ev-feed/logs/web.err.log',
       // Config out file for web logs
-      out_file: '/var/www/cm-lobby/logs/web.out.log',
+      out_file: '/var/www/ev-feed/logs/web.out.log',
       // Number of instances to be started in cluster mode
       instances: 1,
       // Enable or disable auto restart after process failure
@@ -45,11 +45,11 @@ module.exports = {
       // GIT remote/branch
       ref: 'origin/main',
       // GIT remote
-      repo: 'git@github.com:Null-Cat/CorruptedMemoryLobby.git',
+      repo: 'git@github.com:Null-Cat/EndlessVendettaFeedbackServer.git',
       // Fetch all branches or fast
       fetch: 'all',
       // Path in the server
-      path: '/var/www/cm-lobby',
+      path: '/var/www/ev-feed',
       'post-setup': "ls -la",
       // Command run after pull source code
       'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production'
