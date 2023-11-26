@@ -1,0 +1,14 @@
+:root {
+    --bg-color: #0f0f0f;
+    --text-color: #fff;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Tahoma', sans-serif;
+}
+
+.table>:not(caption)>*>* {
+    background-color: var(--bg-color);
+}
