@@ -127,7 +127,7 @@
                     <div class="d-flex justify-content-center">
                         <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Total Time</h3>
                     </div>
-                    <% if (events.find(event=> event.EventKey === 'end').Timestamp) { %>
+                    <% if (events.find(event=> event.EventKey === 'end')) { %>
                         <p id="totalTime" class="card-text text-center display-1" style="font-family: system-ui;">
                             <%-
                                 (events.find(event=> event.EventKey === 'end').Timestamp - events.find(event=>
