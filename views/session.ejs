@@ -76,10 +76,10 @@
                     <div class="d-flex justify-content-center">
                         <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Pickup</h3>
                     </div>
-                    <p id="pickup" class="card-text text-center display-1" style="font-family: system-ui;"><%- (new
-                            Date(events.find(event=> event.EventKey === 'start').Timestamp) - (events.find(event =>
-                            event.EventKey === 'pickup')) ? rows.find(event => event.EventKey ===
-                            'pickup').EventTimestamp : new Date()) / 1000 + "s" %> </p>
+                    <p id="pickup" class="card-text text-center display-1" style="font-family: system-ui;">0s</p>
+                    <!-- <%-
+                            events.find(event=> event.EventKey === 'pickup').Timestamp - events.find(event=>
+                                event.EventKey === 'start').Timestamp %>  -->
                 </div>
             </div>
             <div class="card bg-dark text-white">
