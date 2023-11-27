@@ -147,11 +147,11 @@
                 cell1.innerHTML = data.EventID;
                 cell2.innerHTML = data.EventKey;
                 cell3.innerHTML = data.EventData;
-                cell4.innerHTML = new Date(data.Timestamp);
+                cell4.innerHTML = new Date();
                 items.add({
                     id: items.length + 1,
                     content: data.EventData ? data.EventKey.toUpperCase() + ": " + data.EventData : data.EventKey.toUpperCase(),
-                    start: new Date(data.Timestamp)
+                    start: new Date()
                 });
                 timeline.fit()
                 timeline.focus(items.length)
