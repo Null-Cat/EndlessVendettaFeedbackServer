@@ -270,7 +270,7 @@ server.listen(port, () => {
 io.on('connection', (socket) => {
   console.log(`${logTimestamp} New Socket Connection ${clc.green(`${socket.id}`)}`)
   const referer = new URL(socket.request.headers.referer)
-  const regex = /^\/session\/[A-Z]{5}$/
+  const regex = /^\/session\/[A-Z0-9]{5}$/
   if (regex.test(referer.pathname)) {
     socket.join(referer.pathname.slice(-5))
     console.log(`${logTimestamp} Socket ${clc.green(`${socket.id}`)} Joined ${clc.green(`${referer.pathname.slice(-5)}`)}`)
