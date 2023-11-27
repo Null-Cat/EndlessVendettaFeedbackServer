@@ -110,6 +110,18 @@
                             <% } %>
                 </div>
             </div>
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time House</h3>
+                    </div>
+                    <% if (events.find(event=> event.EventKey === 'kill')) { %>
+                    <p id="timeHouse" class="card-text text-center display-1" style="font-family: system-ui;">
+                        <%-
+                            (events.filter(event=> event.EventKey === 'end').length %> </p>
+                            <% } %>
+                </div>
+            </div>
             </div>
         </div>
 
