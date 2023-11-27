@@ -37,7 +37,7 @@
             // DOM element where the Timeline will be attached
             var container = document.getElementById('visualization');
 
-            let eventsData = <% - JSON.stringify(events) %>;
+            let eventsData = <%- JSON.stringify(events) %>;
             let formattedEvents = [];
             for (var i = 0; i < eventsData.length; i++) {
                 var event = eventsData[i];
