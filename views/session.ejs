@@ -71,6 +71,45 @@
                             events.find(event=> event.EventKey === 'start').EventData %></p>
                 </div>
             </div>
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Pickup</h3>
+                    </div>
+                    <% if (events.find(event=> event.EventKey === 'pickup').Timestamp) { %>
+                    <p id="pickup" class="card-text text-center display-1" style="font-family: system-ui;">
+                        <%-
+                            (events.find(event=> event.EventKey === 'pickup').Timestamp - events.find(event=>
+                            event.EventKey === 'start').Timestamp) / 1000 + "s" %> </p>
+                            <% } %>
+                </div>
+            </div>
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time Tutorial</h3>
+                    </div>
+                    <% if (events.find(event=> event.EventKey === 'house').Timestamp) { %>
+                    <p id="timeTutorial" class="card-text text-center display-1" style="font-family: system-ui;">
+                        <%-
+                            (events.find(event=> event.EventKey === 'house').Timestamp - events.find(event=>
+                            event.EventKey === 'start').Timestamp) / 1000 + "s" %> </p>
+                            <% } %>
+                </div>
+            </div>
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time House</h3>
+                    </div>
+                    <% if (events.find(event=> event.EventKey === 'end').Timestamp) { %>
+                    <p id="timeHouse" class="card-text text-center display-1" style="font-family: system-ui;">
+                        <%-
+                            (events.find(event=> event.EventKey === 'end').Timestamp - events.find(event=>
+                            event.EventKey === 'house').Timestamp) / 1000 + "s" %> </p>
+                            <% } %>
+                </div>
+            </div>
             </div>
         </div>
 
