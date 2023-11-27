@@ -1,5 +1,8 @@
 require('dotenv').config()
 const express = require('express')
+const app = express()
+const server = require('http').createServer(app)
+const io = require('socket.io')(server, { cors: { origin: '*' } })
 const fs = require('fs')
 const clc = require('cli-color')
 const crypto = require('crypto')
@@ -13,7 +16,6 @@ const pool = mariadb.createPool({
   connectionLimit: 10
 })
 
-const app = express()
 const port = process.env.PORT || 3001
 
 app.set('view engine', 'ejs')
@@ -50,38 +52,38 @@ app.get('/users', (req, res) => {
 
 app.get('/sessions', (req, res) => {
   let sessionsData
-pool.getConnection().then((conn) => {
+  pool.getConnection().then((conn) => {
     conn
-        .query('SELECT SessionID, PlayerGUID, Timestamp FROM FeedbackEvents WHERE EventKey = "start"')
-        .then((rows) => {
-            if (rows.length > 0) {
-                sessionsData = rows
-            } else {
-                res.sendStatus(404)
-            }
-        })
-        .catch((err) => {
-            //handle error
-            console.log(err)
-            conn.end()
-            return
-        })
+      .query('SELECT SessionID, PlayerGUID, Timestamp FROM FeedbackEvents WHERE EventKey = "start"')
+      .then((rows) => {
+        if (rows.length > 0) {
+          sessionsData = rows
+        } else {
+          res.sendStatus(404)
+        }
+      })
+      .catch((err) => {
+        //handle error
+        console.log(err)
+        conn.end()
+        return
+      })
     conn
-        .query('SELECT SessionID FROM FeedbackEvents WHERE EventKey = "end"')
-        .then((rows) => {
-            const sessionsEnd = rows.map((row) => row.SessionID)
-            res.render('sessions.ejs', { sessions: sessionsData, sessionsEnd })
-            conn.end()
-        })
-        .catch((err) => {
-            //handle error
-            console.log(err)
-            conn.end()
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-})
+      .query('SELECT SessionID FROM FeedbackEvents WHERE EventKey = "end"')
+      .then((rows) => {
+        const sessionsEnd = rows.map((row) => row.SessionID)
+        res.render('sessions.ejs', { sessions: sessionsData, sessionsEnd })
+        conn.end()
+      })
+      .catch((err) => {
+        //handle error
+        console.log(err)
+        conn.end()
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
 })
 
 app.get('/session/:session', (req, res) => {
@@ -89,7 +91,6 @@ app.get('/session/:session', (req, res) => {
     conn
       .query('SELECT EventID, PlayerGUID, EventKey, EventData, Timestamp FROM FeedbackEvents WHERE SessionID = ?', [req.params.session])
       .then((rows) => {
-        console.log(rows)
         if (rows.length > 0) {
           res.render('session.ejs', { events: rows, session: req.params.session })
         } else {
@@ -153,7 +154,7 @@ app.get('/api/user/:username', (req, res) => {
 app.get('/api/session/:session', (req, res) => {
   pool.getConnection().then((conn) => {
     conn
-      .query('SELECT * FROM FeedbackEvents WHERE SessionID = ?', [req.params.session])
+      .query('SELECT * FROM FeedbackEvents WHERE SessionID ? ORDER BY Timestamp Desc', [req.params.session])
       .then((rows) => {
         if (rows.length > 0) {
           res.send(rows)
@@ -183,7 +184,7 @@ app.post('/api/user/', express.json(), (req, res) => {
   const values = Object.values(req.body)
   pool.getConnection().then((conn) => {
     conn
-      .query('INSERT INTO Players SET = ?', [req.body.data])
+      .query(`INSERT INTO Players (${columns}) VALUES (?)`, [values])
       .then((rows) => {
         if (rows.length > 0) {
           res.sendStatus(201)
@@ -222,6 +223,13 @@ app.post('/api/event/', express.json(), (req, res) => {
       .then((rows) => {
         res.sendStatus(201)
         console.log(`${logTimestamp} ${clc.green(`'${req.body.EventKey}' Event Logged for ${req.body.SessionID}`)}`)
+        io.to(req.body.SessionID).emit('eventTrigger', req.body)
+        if (req.body.EventKey.toLowerCase() === 'end') {
+          io.to('sessions').emit('sessionEnd', req.body.SessionID)
+        }
+        if (req.body.EventKey.toLowerCase() === 'start') {
+          io.to('sessions').emit('sessionStart', req.body)
+        }
         conn.end()
       })
       .catch((err) => {
@@ -255,8 +263,25 @@ function LogConnections(req, res, next) {
   next()
 }
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`${clc.green(`${logTimestamp} Listening on port ${port}`)}`)
+})
+
+io.on('connection', (socket) => {
+  console.log(`${logTimestamp} New Socket Connection ${clc.green(`${socket.id}`)}`)
+  const referer = new URL(socket.request.headers.referer)
+  const regex = /^\/session\/[A-Z]{5}$/
+  if (regex.test(referer.pathname)) {
+    socket.join(referer.pathname.slice(-5))
+    console.log(`${logTimestamp} Socket ${clc.green(`${socket.id}`)} Joined ${clc.green(`${referer.pathname.slice(-5)}`)}`)
+  }
+  if (referer.pathname === '/sessions' || referer.pathname === '/sessions/') {
+    socket.join('sessions')
+    console.log(`${logTimestamp} Socket ${clc.green(`${socket.id}`)} Joined ${clc.green(`sessions`)}`)
+  }
+  socket.on('disconnect', () => {
+    console.log(`${logTimestamp} ${clc.red(`Socket Disconnected ${socket.id}`)}`)
+  })
 })
 
 var date = new Date(),

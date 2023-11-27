@@ -13,6 +13,7 @@
         src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
     <link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet"
         type="text/css" />
+    <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/css/index.css">
     <title>Session <%= session %>
     </title>
@@ -20,6 +21,9 @@
 
 <body>
     <div class="container">
+        <div class="d-flex justify-content-center" style="padding: 15px;">
+            <a href="/sessions" class="btn btn-danger">Return to Sessions</a>
+        </div>
         <div class="d-flex justify-content-center">
             <h1 class="display-4" style="padding: 25px; font-family: system-ui;">Session <%= session %>
             </h1>
@@ -53,13 +57,55 @@
             // Create a Timeline
             var timeline = new vis.Timeline(container, items, options);
         </script>
+        <div class="d-flex justify-content-center">
+            <h1 class="display-6" style="padding: 25px; font-family: system-ui;">Stats</h1>
+        </div>
+
+        <div id="statCards" class="d-flex justify-content-center flex-wrap" style="gap: 10px;">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Game State</h3>
+                    </div>
+                    <p id="gameState" class="card-text text-center display-1" style="font-family: system-ui;"><%-
+                            events.find(event=> event.EventKey === 'start').EventData %></p>
+                </div>
+            </div>
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Pickup</h3>
+                    </div>
+                    <p id="pickup" class="card-text text-center display-1" style="font-family: system-ui;"><%- (new
+                            Date(events.find(event=> event.EventKey === 'start').Timestamp) - (events.find(event =>
+                            event.EventKey === 'pickup')) ? rows.find(event => event.EventKey ===
+                            'pickup').EventTimestamp : new Date()) / 1000 + "s" %> </p>
+                </div>
+            </div>
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time Tutorial</h3>
+                    </div>
+                    <p id="timeTutorial" class="card-text text-center display-1" style="font-family: system-ui;">0s</p>
+                </div>
+            </div>
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center">
+                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time House</h3>
+                    </div>
+                    <p id="timeHouse" class="card-text text-center display-1" style="font-family: system-ui;">0s</p>
+                </div>
+            </div>
+        </div>
 
         <div class="d-flex justify-content-center">
             <h1 class="display-6" style="padding: 25px; font-family: system-ui;">Events</h1>
         </div>
 
         <div class="d-flex justify-content-center">
-            <table class="table table-dark table-striped table-hover table-bordered">
+            <table id="eventsTable" class="table table-dark table-striped table-hover table-bordered">
                 <thead>
                     <tr>
                         <th>Event ID</th>
@@ -88,6 +134,27 @@
                 </tbody>
             </table>
         </div>
+
+        <script>
+            const socket = io();
+            socket.on('eventTrigger', (data) => {
+                let table = document.getElementById("eventsTable");
+                let row = table.insertRow();
+                let cell1 = row.insertCell();
+                let cell2 = row.insertCell();
+                let cell3 = row.insertCell();
+                let cell4 = row.insertCell();
+                cell1.innerHTML = data.EventID;
+                cell2.innerHTML = data.EventKey;
+                cell3.innerHTML = data.EventData;
+                cell4.innerHTML = new Date(data.Timestamp);
+                items.add({
+                    id: data.EventID,
+                    content: data.EventData ? data.EventKey.toUpperCase() + ": " + data.EventData : data.EventKey.toUpperCase(),
+                    start: data.Timestamp
+                });
+            });
+        </script>
 
     </div>
 

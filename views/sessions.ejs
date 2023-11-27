@@ -9,6 +9,7 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/js/all.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/css/index.css">
     <title>Sessions</title>
 </head>
@@ -19,21 +20,23 @@
             <h1 class="display-4" style="padding: 25px; font-family: system-ui;">Sessions</h1>
         </div>
 
-        <div class="d-flex justify-content-center" style="gap: 10px;">
+        <div id="sessionCards" class="d-flex justify-content-center flex-wrap" style="gap: 10px;">
             <% sessions.forEach(session=> { %>
                 <div class="card bg-dark text-white">
                     <div class="card-body">
                         <div class="d-flex justify-content-center">
-                            <a href="/session/<%= session.SessionID %>" class="card-title h4">
+                            <a href="/session/<%= session.SessionID %>" class="card-title h3">
                                 <%= session.SessionID %>
                             </a>
                         </div>
                         <p class="card-text">Started at <%= session.Timestamp %>
                         </p>
                         <% if (sessionsEnd.includes(session.SessionID)) { %>
-                            <p class="card-text display-6" style="font-family: system-ui;">Session Ended</p>
+                            <p id="<%= session.SessionID %>" class="card-text display-6"
+                                style="font-family: system-ui;">Session Ended</p>
                             <% } else { %>
-                                <p class="card-text display-6" style="font-family: system-ui;">Session <em>Ongoing</em>
+                                <p id="<%= session.SessionID %>" class="card-text display-6"
+                                    style="font-family: system-ui;">Session <em>Ongoing</em>
                                 </p>
                                 <% } %>
                                     <a href="/session/<%= session.SessionID %>" class="btn btn-secondary">Details</a>
@@ -42,6 +45,43 @@
                 <% }) %>
         </div>
 
+        <script>
+            const socket = io();
+            socket.on('sessionEnd', (sessionID) => {
+                document.getElementById(sessionID).innerHTML = "Session Ended";
+            });
+            socket.on('sessionStart', (sessionData) => {
+                let targetElement = document.getElementById("sessionCards")
+                let newCard = document.createElement('div');
+                newCard.className = "card bg-dark text-white";
+                let newCardBody = document.createElement('div');
+                newCardBody.className = "card-body";
+                let newCardTitle = document.createElement('div');
+                newCardTitle.className = "d-flex justify-content-center";
+                let newCardTitleLink = document.createElement('a');
+                newCardTitleLink.className = "card-title h3";
+                newCardTitleLink.href = "/session/" + sessionData.SessionID;
+                newCardTitleLink.innerHTML = sessionData.SessionID;
+                newCardTitle.appendChild(newCardTitleLink);
+                let newCardText = document.createElement('p');
+                newCardText.className = "card-text";
+                newCardText.innerHTML = "Started at " + new Date(sessionData.Timestamp);
+                let newCardText2 = document.createElement('p');
+                newCardText2.className = "card-text display-6";
+                newCardText2.style = "font-family: system-ui;";
+                newCardText2.innerHTML = "Session <em>Ongoing</em>";
+                let newCardButton = document.createElement('a');
+                newCardButton.className = "btn btn-secondary";
+                newCardButton.href = "/session/" + sessionData.SessionID;
+                newCardButton.innerHTML = "Details";
+                newCardBody.appendChild(newCardTitle);
+                newCardBody.appendChild(newCardText);
+                newCardBody.appendChild(newCardText2);
+                newCardBody.appendChild(newCardButton);
+                newCard.appendChild(newCardBody);
+                targetElement.appendChild(newCard);
+            });
+        </script>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
