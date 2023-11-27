@@ -4,6 +4,7 @@ const fs = require('fs')
 const clc = require('cli-color')
 const crypto = require('crypto')
 const mariadb = require('mariadb')
+const { log } = require('console')
 const pool = mariadb.createPool({
   host: '192.168.0.79',
   user: 'ev-client',
@@ -28,12 +29,72 @@ app.get('/', (req, res) => {
   res.render('index.ejs')
 })
 
-app.get('/users/', (req, res) => {
+app.get('/users', (req, res) => {
   pool.getConnection().then((conn) => {
     conn
       .query('SELECT * FROM Players')
       .then((rows) => {
         res.render('players.ejs', { players: rows })
+        conn.end()
+      })
+      .catch((err) => {
+        //handle error
+        console.log(err)
+        conn.end()
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
+})
+
+app.get('/sessions', (req, res) => {
+  let sessionsData
+pool.getConnection().then((conn) => {
+    conn
+        .query('SELECT SessionID, PlayerGUID, Timestamp FROM FeedbackEvents WHERE EventKey = "start"')
+        .then((rows) => {
+            if (rows.length > 0) {
+                sessionsData = rows
+            } else {
+                res.sendStatus(404)
+            }
+        })
+        .catch((err) => {
+            //handle error
+            console.log(err)
+            conn.end()
+            return
+        })
+    conn
+        .query('SELECT SessionID FROM FeedbackEvents WHERE EventKey = "end"')
+        .then((rows) => {
+            const sessionsEnd = rows.map((row) => row.SessionID)
+            res.render('sessions.ejs', { sessions: sessionsData, sessionsEnd })
+            conn.end()
+        })
+        .catch((err) => {
+            //handle error
+            console.log(err)
+            conn.end()
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+})
+})
+
+app.get('/session/:session', (req, res) => {
+  pool.getConnection().then((conn) => {
+    conn
+      .query('SELECT EventID, PlayerGUID, EventKey, EventData, Timestamp FROM FeedbackEvents WHERE SessionID = ?', [req.params.session])
+      .then((rows) => {
+        console.log(rows)
+        if (rows.length > 0) {
+          res.render('session.ejs', { events: rows, session: req.params.session })
+        } else {
+          res.sendStatus(404)
+        }
         conn.end()
       })
       .catch((err) => {
@@ -89,11 +150,37 @@ app.get('/api/user/:username', (req, res) => {
   })
 })
 
+app.get('/api/session/:session', (req, res) => {
+  pool.getConnection().then((conn) => {
+    conn
+      .query('SELECT * FROM FeedbackEvents WHERE SessionID = ?', [req.params.session])
+      .then((rows) => {
+        if (rows.length > 0) {
+          res.send(rows)
+        } else {
+          res.sendStatus(404)
+        }
+        conn.end()
+      })
+      .catch((err) => {
+        //handle error
+        console.log(err)
+        conn.end()
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
+})
+
 app.post('/api/user/', express.json(), (req, res) => {
-  if (!req.body.data.Username && !req.body.data.GUID) {
+  if (!req.body.Username && !req.body.GUID) {
     res.sendStatus(400)
     return
   }
+
+  const columns = Object.keys(req.body).join(', ')
+  const values = Object.values(req.body)
   pool.getConnection().then((conn) => {
     conn
       .query('INSERT INTO Players SET = ?', [req.body.data])
@@ -122,19 +209,19 @@ app.post('/api/user/', express.json(), (req, res) => {
 })
 
 app.post('/api/event/', express.json(), (req, res) => {
-  if (!req.body.data.eventID && !req.body.data.SessionID && !req.body.data.PlayerGUID && !req.body.data.EventKey && !req.body.data.EventData && !req.body.data.Timestamp) {
+  if (!req.body.EventID && !req.body.SessionID && !req.body.PlayerGUID && !req.body.EventKey && !req.body.EventData && !req.body.Timestamp) {
     res.sendStatus(400)
     return
   }
+
+  const columns = Object.keys(req.body).join(', ')
+  const values = Object.values(req.body)
   pool.getConnection().then((conn) => {
     conn
-      .query('INSERT INTO FeedbackEvents SET = ?', [req.body.data])
+      .query(`INSERT INTO FeedbackEvents (${columns}) VALUES (?)`, [values])
       .then((rows) => {
-        if (rows.length > 0) {
-          res.sendStatus(201)
-        } else {
-          res.sendStatus(404)
-        }
+        res.sendStatus(201)
+        console.log(`${logTimestamp} ${clc.green(`'${req.body.EventKey}' Event Logged for ${req.body.SessionID}`)}`)
         conn.end()
       })
       .catch((err) => {
@@ -144,11 +231,13 @@ app.post('/api/event/', express.json(), (req, res) => {
           res.sendStatus(409)
         } else {
           console.log(err)
+          res.sendStatus(500)
         }
         conn.end()
       })
       .catch((err) => {
         console.log(err)
+        res.sendStatus(500)
       })
   })
 })
@@ -187,11 +276,8 @@ var date = new Date(),
 function makeID(length) {
   let result = ''
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  const charactersLength = characters.length
-  let counter = 0
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength))
-    counter += 1
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length))
   }
   return result
 }
