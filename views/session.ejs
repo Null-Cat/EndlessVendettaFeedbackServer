@@ -118,7 +118,7 @@
                     <% if (events.find(event=> event.EventKey === 'kill')) { %>
                     <p id="timeHouse" class="card-text text-center display-1" style="font-family: system-ui;">
                         <%-
-                            (events.filter(event=> event.EventKey === 'end').length %> </p>
+                            (events.filter(event=> event.EventKey === 'end')).length %> </p>
                             <% } %>
                 </div>
             </div>
