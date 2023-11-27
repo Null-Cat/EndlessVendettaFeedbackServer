@@ -149,10 +149,12 @@
                 cell3.innerHTML = data.EventData;
                 cell4.innerHTML = new Date(data.Timestamp);
                 items.add({
-                    id: data.EventID,
+                    id: items.length + 1,
                     content: data.EventData ? data.EventKey.toUpperCase() + ": " + data.EventData : data.EventKey.toUpperCase(),
                     start: data.Timestamp
                 });
+                timeline.fit()
+                timeline.focus(items.length)
             });
         </script>
 
