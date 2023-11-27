@@ -37,7 +37,7 @@
             // DOM element where the Timeline will be attached
             var container = document.getElementById('visualization');
 
-            let eventsData = <%- JSON.stringify(events) %>;
+            let eventsData = <% - JSON.stringify(events) %>;
             let formattedEvents = [];
             for (var i = 0; i < eventsData.length; i++) {
                 var event = eventsData[i];
@@ -78,7 +78,7 @@
                     </div>
                     <p id="pickup" class="card-text text-center display-1" style="font-family: system-ui;"><%-
                             (events.find(event=> event.EventKey === 'pickup').Timestamp - events.find(event=>
-                                event.EventKey === 'start').Timestamp) / 1000 + "s" %> </p>
+                            event.EventKey === 'start').Timestamp) / 1000 + "s" %> </p>
                 </div>
             </div>
             <div class="card bg-dark text-white">
@@ -87,8 +87,8 @@
                         <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time Tutorial</h3>
                     </div>
                     <p id="timeTutorial" class="card-text text-center display-1" style="font-family: system-ui;"><%-
-                        (events.find(event=> event.EventKey === 'house').Timestamp - events.find(event=>
-                            event.EventKey === 'start').Timestamp) / 1000 + "s"</p>
+                            (events.find(event=> event.EventKey === 'house').Timestamp - events.find(event=>
+                            event.EventKey === 'start').Timestamp) / 1000 + "s" %> </p>
                 </div>
             </div>
             <div class="card bg-dark text-white">
@@ -98,7 +98,7 @@
                     </div>
                     <p id="timeHouse" class="card-text text-center display-1" style="font-family: system-ui;"><%-
                             (events.find(event=> event.EventKey === 'end').Timestamp - events.find(event=>
-                                event.EventKey === 'house').Timestamp) / 1000 + "s"</p>
+                            event.EventKey === 'house').Timestamp) / 1000 + "s" %> </p>
                 </div>
             </div>
         </div>
