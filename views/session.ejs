@@ -76,7 +76,7 @@
                     <div class="d-flex justify-content-center">
                         <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Pickup</h3>
                     </div>
-                    <% if (events.find(event=> event.EventKey === 'pickup').Timestamp) { %>
+                    <% if (events.find(event=> event.EventKey === 'pickup')) { %>
                     <p id="pickup" class="card-text text-center display-1" style="font-family: system-ui;">
                         <%-
                             (events.find(event=> event.EventKey === 'pickup').Timestamp - events.find(event=>
@@ -89,7 +89,7 @@
                     <div class="d-flex justify-content-center">
                         <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time in Tutorial</h3>
                     </div>
-                    <% if (events.find(event=> event.EventKey === 'house').Timestamp) { %>
+                    <% if (events.find(event=> event.EventKey === 'house')) { %>
                     <p id="timeTutorial" class="card-text text-center display-1" style="font-family: system-ui;">
                         <%-
                             (events.find(event=> event.EventKey === 'house').Timestamp - events.find(event=>
