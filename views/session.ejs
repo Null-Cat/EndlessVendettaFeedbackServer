@@ -151,7 +151,7 @@
                 items.add({
                     id: items.length + 1,
                     content: data.EventData ? data.EventKey.toUpperCase() + ": " + data.EventData : data.EventKey.toUpperCase(),
-                    start: data.Timestamp
+                    start: new Date(data.Timestamp).toUTCString()
                 });
                 timeline.fit()
                 timeline.focus(items.length)
