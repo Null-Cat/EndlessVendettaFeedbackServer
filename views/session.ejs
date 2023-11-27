@@ -119,7 +119,9 @@
                     <p id="playerKills" class="card-text text-center display-1" style="font-family: system-ui;">
                         <%-
                             (events.filter(event=> event.EventKey === 'kill')).length %> </p>
-                            <% } %>
+                            <% } else { %>
+                                <p id="playerKills" class="card-text text-center display-1" style="font-family: system-ui;">0</p>
+                                <% } %>
                 </div>
             </div>
             <div class="card bg-dark text-white">
