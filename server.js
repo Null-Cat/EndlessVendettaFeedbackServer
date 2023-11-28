@@ -42,10 +42,12 @@ app.get('/users', (req, res) => {
       .catch((err) => {
         //handle error
         console.log(err)
+        res.sendStatus(500)
         conn.end()
       })
       .catch((err) => {
         console.log(err)
+        res.sendStatus(500)
       })
   })
 })
@@ -65,6 +67,7 @@ app.get('/sessions', (req, res) => {
       .catch((err) => {
         //handle error
         console.log(err)
+        res.sendStatus(500)
         conn.end()
         return
       })
@@ -78,10 +81,12 @@ app.get('/sessions', (req, res) => {
       .catch((err) => {
         //handle error
         console.log(err)
+        res.sendStatus(500)
         conn.end()
       })
       .catch((err) => {
         console.log(err)
+        res.sendStatus(500)
       })
   })
 })
@@ -101,10 +106,12 @@ app.get('/session/:session', (req, res) => {
       .catch((err) => {
         //handle error
         console.log(err)
+        res.sendStatus(500)
         conn.end()
       })
       .catch((err) => {
         console.log(err)
+        res.sendStatus(500)
       })
   })
 })
@@ -120,10 +127,12 @@ app.get('/api/users/', (req, res) => {
       .catch((err) => {
         //handle error
         console.log(err)
+        res.sendStatus(500)
         conn.end()
       })
       .catch((err) => {
         console.log(err)
+        res.sendStatus(500)
       })
   })
 })
@@ -143,10 +152,12 @@ app.get('/api/user/:username', (req, res) => {
       .catch((err) => {
         //handle error
         console.log(err)
+        res.sendStatus(500)
         conn.end()
       })
       .catch((err) => {
         console.log(err)
+        res.sendStatus(500)
       })
   })
 })
@@ -166,10 +177,12 @@ app.get('/api/session/:session', (req, res) => {
       .catch((err) => {
         //handle error
         console.log(err)
+        res.sendStatus(500)
         conn.end()
       })
       .catch((err) => {
         console.log(err)
+        res.sendStatus(500)
       })
   })
 })
@@ -200,11 +213,13 @@ app.post('/api/user/', express.json(), (req, res) => {
           res.sendStatus(409)
         } else {
           console.log(err)
+          res.sendStatus(500)
         }
         conn.end()
       })
       .catch((err) => {
         console.log(err)
+        res.sendStatus(500)
       })
   })
 })
