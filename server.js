@@ -250,6 +250,32 @@ app.post('/api/event/', express.json(), (req, res) => {
   })
 })
 
+app.delete('/api/session/:session', (req, res) => {
+  pool.getConnection().then((conn) => {
+    conn
+      .query('DELETE FROM FeedbackEvents WHERE SessionID = ?', [req.params.session])
+      .then((rows) => {
+        if (rows) {
+          res.sendStatus(200)
+          console.log(`${logTimestamp} ${clc.red(`Session ${req.params.session} Deleted`)}`)
+        } else {
+          res.sendStatus(404)
+        }
+        conn.end()
+      })
+      .catch((err) => {
+        //handle error
+        console.log(err)
+        res.sendStatus(500)
+        conn.end()
+      })
+      .catch((err) => {
+        res.sendStatus(500)
+        console.log(err)
+      })
+  })
+})
+
 app.all('*', (req, res) => {
   res.sendStatus(404)
 })
