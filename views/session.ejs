@@ -181,7 +181,7 @@
                                 <%= event.EventData %>
                             </td>
                             <td>
-                                <%= event.Timestamp %>
+                                <%= event.Timestamp.toLocaleString() %>
                             </td>
                         </tr>
                         <% }) %>
@@ -201,7 +201,7 @@
                 eventIDCell.innerHTML = data.EventID;
                 eventKeyCell.innerHTML = data.EventKey;
                 eventDataCell.innerHTML = data.EventData;
-                timeCell.innerHTML = new Date();
+                timeCell.innerHTML = new Date().toLocaleString();
                 items.add({
                     id: items.length + 1,
                     content: data.EventData ? data.EventKey.toUpperCase() + ": " + data.EventData : data.EventKey.toUpperCase(),

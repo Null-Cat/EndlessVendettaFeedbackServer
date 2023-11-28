@@ -25,11 +25,12 @@
                 <div class="card bg-dark text-white">
                     <div class="card-body">
                         <div class="d-flex justify-content-center">
-                            <a href="/session/<%= session.SessionID %>" class="card-title h3">
+                            <a href="/session/<%= session.SessionID %>" class="card-title display-4"
+                                style="font-family: system-ui; text-decoration: none;">
                                 <%= session.SessionID %>
                             </a>
                         </div>
-                        <p class="card-text">Started at <%= session.Timestamp %>
+                        <p class="card-text">Started at <%= session.Timestamp.toLocaleString() %>
                         </p>
                         <% if (sessionsEnd.includes(session.SessionID)) { %>
                             <p id="<%= session.SessionID %>" class="card-text display-6"
@@ -59,13 +60,14 @@
                 let newCardTitle = document.createElement('div');
                 newCardTitle.className = "d-flex justify-content-center";
                 let newCardTitleLink = document.createElement('a');
-                newCardTitleLink.className = "card-title h3";
+                newCardTitleLink.className = "card-title display-2";
+                newCardTitleLink.style = "font-family: system-ui; text-decoration: none;";
                 newCardTitleLink.href = "/session/" + sessionData.SessionID;
                 newCardTitleLink.innerHTML = sessionData.SessionID;
                 newCardTitle.appendChild(newCardTitleLink);
                 let newCardText = document.createElement('p');
                 newCardText.className = "card-text";
-                newCardText.innerHTML = "Started at " + new Date(sessionData.Timestamp);
+                newCardText.innerHTML = "Started at " + new Date().toLocaleString();
                 let newCardText2 = document.createElement('p');
                 newCardText2.className = "card-text display-6";
                 newCardText2.style = "font-family: system-ui;";
