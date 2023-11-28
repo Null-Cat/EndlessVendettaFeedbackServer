@@ -15,15 +15,17 @@
         type="text/css" />
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/css/index.css">
-    <title>Session <%= session %></title>
+    <title>Session <%= session %>
+    </title>
 </head>
 
 <body>
     <% function toMMmSSs(milliseconds) { const seconds=milliseconds / 1000; const minutes=Math.floor(seconds / 60);
-        const secondsFormatted=Math.floor(seconds % 60); return minutes + "m" + ((secondsFormatted === 0) ? "" : secondsFormatted + "s") ; } %>
+        const secondsFormatted=Math.floor(seconds % 60); return minutes + "m" + ((secondsFormatted===0) ? "" :
+        secondsFormatted + "s" ) ; } %>
         <div class="container">
             <div class="d-flex justify-content-center" style="padding: 15px;">
-                <a href="/sessions" class="btn btn-danger">Return to Sessions</a>
+                <a href="/sessions" class="btn btn-primary">Return to Sessions</a>
             </div>
             <div class="d-flex justify-content-center">
                 <h1 class="display-4" style="padding: 25px; font-family: system-ui;">Session <%= session %>
@@ -33,10 +35,16 @@
             <div class="d-flex justify-content-center">
                 <h1 class="display-6" style="padding: 25px; font-family: system-ui;">Timeline</h1>
             </div>
-            <div id="visualization"></div>
+        </div>
+        <div id="timeline"></div>
+        <div class="container">
+            <div class="d-flex justify-content-center">
+                <button id="resetTimeline" class="btn btn-secondary" style="margin: 10px;"><i
+                        class="bi bi-arrow-clockwise"></i></button>
+            </div>
             <script>
                 // DOM element where the Timeline will be attached
-                var container = document.getElementById('visualization');
+                var container = document.getElementById('timeline');
 
                 let eventsData = <%- JSON.stringify(events) %>;
                 let formattedEvents = [];
@@ -52,6 +60,9 @@
                 var items = new vis.DataSet(formattedEvents);
                 var options = {};
                 var timeline = new vis.Timeline(container, items, options);
+                document.getElementById('resetTimeline').addEventListener("click", function () {
+                    timeline.fit();
+                });
             </script>
             <div class="d-flex justify-content-center">
                 <h1 class="display-6" style="padding: 25px; font-family: system-ui;">Stats</h1>
