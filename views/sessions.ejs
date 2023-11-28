@@ -35,7 +35,7 @@
                         </p>
                         <% if (sessionsEnd.includes(session.SessionID)) { %>
                             <p id="<%= session.SessionID %>" class="card-text display-6 text-center"
-                                style="font-family: system-ui;">Ended</p>
+                                style="font-family: system-ui;">Completed</p>
                             <% } else { %>
                                 <p id="<%= session.SessionID %>" class="card-text display-6 text-center"
                                     style="font-family: system-ui;"><em>Ongoing</em>
@@ -51,7 +51,7 @@
         <script>
             const socket = io();
             socket.on('sessionEnd', (sessionID) => {
-                document.getElementById(sessionID).innerHTML = "Ended";
+                document.getElementById(sessionID).innerHTML = "Completed";
             });
             socket.on('sessionStart', (sessionData) => {
                 let targetElement = document.getElementById("sessionCards")
@@ -83,7 +83,7 @@
                 newCardBody.appendChild(newCardText2);
                 newCardBody.appendChild(newCardButton);
                 newCard.appendChild(newCardBody);
-                targetElement.appendChild(newCard);
+                targetElement.prepend(newCard);
             });
         </script>
     </div>
