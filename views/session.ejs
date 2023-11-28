@@ -169,7 +169,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% events.forEach(function(event) { %>
+                    <% events.sort((a,b)=>a.Timestamp-b.Timestamp).forEach(function(event) { %>
                         <tr>
                             <td>
                                 <%= event.EventID %>
