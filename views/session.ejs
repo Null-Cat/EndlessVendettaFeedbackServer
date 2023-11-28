@@ -15,128 +15,131 @@
         type="text/css" />
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/css/index.css">
-    <title>Session <%= session %>
-    </title>
+    <title>Session <%= session %></title>
 </head>
 
 <body>
-    <div class="container">
-        <div class="d-flex justify-content-center" style="padding: 15px;">
-            <a href="/sessions" class="btn btn-danger">Return to Sessions</a>
-        </div>
-        <div class="d-flex justify-content-center">
-            <h1 class="display-4" style="padding: 25px; font-family: system-ui;">Session <%= session %>
-            </h1>
-        </div>
-
-        <div class="d-flex justify-content-center">
-            <h1 class="display-6" style="padding: 25px; font-family: system-ui;">Timeline</h1>
-        </div>
-        <div id="visualization"></div>
-        <script>
-            // DOM element where the Timeline will be attached
-            var container = document.getElementById('visualization');
-
-            let eventsData = <%- JSON.stringify(events) %>;
-            let formattedEvents = [];
-            for (var i = 0; i < eventsData.length; i++) {
-                var event = eventsData[i];
-                formattedEvents.push({
-                    id: i,
-                    content: event.EventData ? event.EventKey.toUpperCase() + ": " + event.EventData : event.EventKey.toUpperCase(),
-                    start: event.Timestamp
-                });
-            }
-
-            // Create a DataSet (allows two way data-binding)
-            var items = new vis.DataSet(formattedEvents);
-
-            // Configuration for the Timeline
-            var options = {};
-
-            // Create a Timeline
-            var timeline = new vis.Timeline(container, items, options);
-        </script>
-        <div class="d-flex justify-content-center">
-            <h1 class="display-6" style="padding: 25px; font-family: system-ui;">Stats</h1>
-        </div>
-
-        <div id="statCards" class="d-flex justify-content-center flex-wrap" style="gap: 10px;">
-            <div class="card bg-dark text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-center">
-                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Game State</h3>
-                    </div>
-                    <p id="gameState" class="card-text text-center display-1" style="font-family: system-ui;"><%-
-                            events.find(event=> event.EventKey === 'start').EventData %></p>
-                </div>
+    <% function toMMmSSs(milliseconds) { const seconds=milliseconds / 1000; const minutes=Math.floor(seconds / 60);
+        const secondsFormatted=Math.floor(seconds % 60); return minutes + "m" + ((secondsFormatted === 0) ? "" : secondsFormatted + "s") ; } %>
+        <div class="container">
+            <div class="d-flex justify-content-center" style="padding: 15px;">
+                <a href="/sessions" class="btn btn-danger">Return to Sessions</a>
             </div>
-            <div class="card bg-dark text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-center">
-                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Pickup</h3>
+            <div class="d-flex justify-content-center">
+                <h1 class="display-4" style="padding: 25px; font-family: system-ui;">Session <%= session %>
+                </h1>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <h1 class="display-6" style="padding: 25px; font-family: system-ui;">Timeline</h1>
+            </div>
+            <div id="visualization"></div>
+            <script>
+                // DOM element where the Timeline will be attached
+                var container = document.getElementById('visualization');
+
+                let eventsData = <%- JSON.stringify(events) %>;
+                let formattedEvents = [];
+                for (var i = 0; i < eventsData.length; i++) {
+                    var event = eventsData[i];
+                    formattedEvents.push({
+                        id: i,
+                        content: event.EventData ? event.EventKey.toUpperCase() + ": " + event.EventData : event.EventKey.toUpperCase(),
+                        start: event.Timestamp
+                    });
+                }
+
+                var items = new vis.DataSet(formattedEvents);
+                var options = {};
+                var timeline = new vis.Timeline(container, items, options);
+            </script>
+            <div class="d-flex justify-content-center">
+                <h1 class="display-6" style="padding: 25px; font-family: system-ui;">Stats</h1>
+            </div>
+
+            <div id="statCards" class="d-flex justify-content-center flex-wrap" style="gap: 10px;">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Game State</h3>
+                        </div>
+                        <p id="gameState" class="card-text text-center display-1" style="font-family: system-ui;"><%-
+                                events.find(event=> event.EventKey === 'start').EventData %></p>
                     </div>
-                    <% if (events.find(event=> event.EventKey === 'pickup')) { %>
-                    <p id="pickup" class="card-text text-center display-1" style="font-family: system-ui;">
-                        <%-
-                            (events.find(event=> event.EventKey === 'pickup').Timestamp - events.find(event=>
-                            event.EventKey === 'start').Timestamp) / 1000 + "s" %> </p>
+                </div>
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Pickup</h3>
+                        </div>
+                        <% if (events.find(event=> event.EventKey === 'pickup')) { %>
+                            <p id="pickup" class="card-text text-center display-1" style="font-family: system-ui;">
+                                <%- toMMmSSs((events.find(event=> event.EventKey === 'pickup').Timestamp -
+                                    events.find(event=>
+                                    event.EventKey === 'start').Timestamp)) %>
+                            </p>
                             <% } %>
-                </div>
-            </div>
-            <div class="card bg-dark text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-center">
-                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time in Tutorial</h3>
                     </div>
-                    <% if (events.find(event=> event.EventKey === 'house')) { %>
-                    <p id="timeTutorial" class="card-text text-center display-1" style="font-family: system-ui;">
-                        <%-
-                            (events.find(event=> event.EventKey === 'house').Timestamp - events.find(event=>
-                            event.EventKey === 'start').Timestamp) / 1000 + "s" %> </p>
+                </div>
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time in Tutorial</h3>
+                        </div>
+                        <% if (events.find(event=> event.EventKey === 'house')) { %>
+                            <p id="timeTutorial" class="card-text text-center display-1"
+                                style="font-family: system-ui;">
+                                <%- toMMmSSs((events.find(event=> event.EventKey === 'house').Timestamp -
+                                    events.find(event=>
+                                    event.EventKey === 'start').Timestamp)) %>
+                            </p>
                             <% } %>
-                </div>
-            </div>
-            <div class="card bg-dark text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-center">
-                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time in House</h3>
                     </div>
-                    <% if (events.find(event=> event.EventKey === 'end')) { %>
-                    <p id="timeHouse" class="card-text text-center display-1" style="font-family: system-ui;">
-                        <%-
-                            (events.find(event=> event.EventKey === 'end').Timestamp - events.find(event=>
-                            event.EventKey === 'house').Timestamp) / 1000 + "s" %> </p>
+                </div>
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Time in House</h3>
+                        </div>
+                        <% if (events.find(event=> event.EventKey === 'end')) { %>
+                            <p id="timeHouse" class="card-text text-center display-1" style="font-family: system-ui;">
+                                <%- toMMmSSs((events.find(event=> event.EventKey === 'end').Timestamp -
+                                    events.find(event=>
+                                    event.EventKey === 'house').Timestamp)) %>
+                            </p>
                             <% } %>
-                </div>
-            </div>
-            <div class="card bg-dark text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-center">
-                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Kills</h3>
                     </div>
-                    <% if (events.find(event=> event.EventKey === 'kill')) { %>
-                    <p id="playerKills" class="card-text text-center display-1" style="font-family: system-ui;">
-                        <%-
-                            (events.filter(event=> event.EventKey === 'kill')).length %> </p>
+                </div>
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Kills</h3>
+                        </div>
+                        <% if (events.find(event=> event.EventKey === 'kill')) { %>
+                            <p id="playerKills" class="card-text text-center display-1" style="font-family: system-ui;">
+                                <%- (events.filter(event=> event.EventKey === 'kill')).length %>
+                            </p>
                             <% } else { %>
-                                <p id="playerKills" class="card-text text-center display-1" style="font-family: system-ui;">0</p>
+                                <p id="playerKills" class="card-text text-center display-1"
+                                    style="font-family: system-ui;">
+                                    0</p>
                                 <% } %>
-                </div>
-            </div>
-            <div class="card bg-dark text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-center">
-                        <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Total Time</h3>
                     </div>
-                    <% if (events.find(event=> event.EventKey === 'end')) { %>
-                        <p id="totalTime" class="card-text text-center display-1" style="font-family: system-ui;">
-                            <%-
-                                (events.find(event=> event.EventKey === 'end').Timestamp - events.find(event=>
-                                event.EventKey === 'start').Timestamp) / 1000 + "s" %> </p>
-                                <% } %>
                 </div>
-            </div>
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <h3 class="card-title" style="font-family: 'Tahoma', sans-serif;">Total Time</h3>
+                        </div>
+                        <% if (events.find(event=> event.EventKey === 'end')) { %>
+                            <p id="totalTime" class="card-text text-center display-1" style="font-family: system-ui;">
+                                <%- toMMmSSs((events.find(event=> event.EventKey === 'end').Timestamp -
+                                    events.find(event=>
+                                    event.EventKey === 'start').Timestamp)) %>
+                            </p>
+                            <% } %>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -179,35 +182,34 @@
             const socket = io();
             socket.on('eventTrigger', (data) => {
                 let table = document.getElementById("eventsTable");
-                let row = table.insertRow();
-                let cell1 = row.insertCell();
-                let cell2 = row.insertCell();
-                let cell3 = row.insertCell();
-                let cell4 = row.insertCell();
-                cell1.innerHTML = data.EventID;
-                cell2.innerHTML = data.EventKey;
-                cell3.innerHTML = data.EventData;
-                cell4.innerHTML = new Date();
+                let newRow = table.insertRow();
+                let eventIDCell = newRow.insertCell();
+                let eventKeyCell = newRow.insertCell();
+                let eventDataCell = newRow.insertCell();
+                let timeCell = newRow.insertCell();
+                eventIDCell.innerHTML = data.EventID;
+                eventKeyCell.innerHTML = data.EventKey;
+                eventDataCell.innerHTML = data.EventData;
+                timeCell.innerHTML = new Date();
                 items.add({
                     id: items.length + 1,
                     content: data.EventData ? data.EventKey.toUpperCase() + ": " + data.EventData : data.EventKey.toUpperCase(),
                     start: new Date()
                 });
                 timeline.fit()
-                if (data.EventKey == 'kill'){
+                if (data.EventKey == 'kill') {
                     document.getElementById('playerKills').innerHTML = parseInt(document.getElementById('playerKills').innerHTML) + 1
                 }
             });
         </script>
+        </div>
 
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
 </body>
 
 </html>
