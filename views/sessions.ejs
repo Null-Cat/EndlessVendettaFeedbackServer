@@ -21,7 +21,7 @@
         </div>
 
         <div id="sessionCards" class="d-flex justify-content-center flex-wrap" style="gap: 10px;">
-            <% sessions.forEach(session=> { %>
+            <% sessions.sort((a,b)=>b.Timestamp-a.Timestamp).forEach(session=> { %>
                 <div class="card bg-dark text-white">
                     <div class="card-body">
                         <div class="d-flex justify-content-center">
@@ -30,17 +30,19 @@
                                 <%= session.SessionID %>
                             </a>
                         </div>
-                        <p class="card-text">Started at <%= session.Timestamp.toLocaleString() %>
+                        <p class="card-text text-center">
+                            <%= session.Timestamp.toLocaleString() %>
                         </p>
                         <% if (sessionsEnd.includes(session.SessionID)) { %>
-                            <p id="<%= session.SessionID %>" class="card-text display-6"
-                                style="font-family: system-ui;">Session Ended</p>
+                            <p id="<%= session.SessionID %>" class="card-text display-6 text-center"
+                                style="font-family: system-ui;">Ended</p>
                             <% } else { %>
-                                <p id="<%= session.SessionID %>" class="card-text display-6"
-                                    style="font-family: system-ui;">Session <em>Ongoing</em>
+                                <p id="<%= session.SessionID %>" class="card-text display-6 text-center"
+                                    style="font-family: system-ui;"><em>Ongoing</em>
                                 </p>
                                 <% } %>
-                                    <a href="/session/<%= session.SessionID %>" class="btn btn-secondary">Details</a>
+                                    <a href="/session/<%= session.SessionID %>"
+                                        class="btn btn-secondary w-100">Details</a>
                     </div>
                 </div>
                 <% }) %>
@@ -49,7 +51,7 @@
         <script>
             const socket = io();
             socket.on('sessionEnd', (sessionID) => {
-                document.getElementById(sessionID).innerHTML = "Session Ended";
+                document.getElementById(sessionID).innerHTML = "Ended";
             });
             socket.on('sessionStart', (sessionData) => {
                 let targetElement = document.getElementById("sessionCards")
@@ -66,14 +68,14 @@
                 newCardTitleLink.innerHTML = sessionData.SessionID;
                 newCardTitle.appendChild(newCardTitleLink);
                 let newCardText = document.createElement('p');
-                newCardText.className = "card-text";
-                newCardText.innerHTML = "Started at " + new Date().toLocaleString();
+                newCardText.className = "card-text text-center";
+                newCardText.innerHTML = new Date().toLocaleString();
                 let newCardText2 = document.createElement('p');
-                newCardText2.className = "card-text display-6";
+                newCardText2.className = "card-text display-6 text-center";
                 newCardText2.style = "font-family: system-ui;";
-                newCardText2.innerHTML = "Session <em>Ongoing</em>";
+                newCardText2.innerHTML = "<em>Ongoing</em>";
                 let newCardButton = document.createElement('a');
-                newCardButton.className = "btn btn-secondary";
+                newCardButton.className = "btn btn-secondary w-100";
                 newCardButton.href = "/session/" + sessionData.SessionID;
                 newCardButton.innerHTML = "Details";
                 newCardBody.appendChild(newCardTitle);

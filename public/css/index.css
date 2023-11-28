@@ -6,7 +6,7 @@
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Tahoma', sans-serif;
+    font-family: system-ui;
 }
 
 .table>:not(caption)>*>* {
