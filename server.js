@@ -154,7 +154,7 @@ app.get('/api/user/:username', (req, res) => {
 app.get('/api/session/:session', (req, res) => {
   pool.getConnection().then((conn) => {
     conn
-      .query('SELECT * FROM FeedbackEvents WHERE SessionID ? ORDER BY Timestamp Desc', [req.params.session])
+      .query('SELECT * FROM FeedbackEvents WHERE SessionID ?', [req.params.session])
       .then((rows) => {
         if (rows.length > 0) {
           res.send(rows)
