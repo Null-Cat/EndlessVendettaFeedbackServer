@@ -229,7 +229,7 @@
 
         <script>
             document.getElementById('deleteSessionButton').addEventListener("click", function () {
-                document.getElementById('deleteSessionButton').ariaDisabled = true;
+                document.getElementById('deleteSessionButton').setAttribute("disabled");
                 document.getElementById('deleteSessionButton').innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>';
                 const xhr = new XMLHttpRequest();
                 xhr.open("DELETE", "/api" + window.location.pathname);

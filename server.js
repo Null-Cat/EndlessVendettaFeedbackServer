@@ -9,7 +9,7 @@ const crypto = require('crypto')
 const mariadb = require('mariadb')
 const { log } = require('console')
 const pool = mariadb.createPool({
-  host: '192.168.0.79',
+  host: '192.168.0.100',
   user: 'ev-client',
   database: 'endlessvendetta',
   password: process.env.DB_PASSWORD,
