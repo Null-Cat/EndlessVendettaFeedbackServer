@@ -54,7 +54,7 @@ module.exports = {
       path: '/var/www/ev-feed',
       'post-setup': "ls -la",
       // Command run after pull source code
-      'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production'
+      'post-deploy': 'sudo npm install && sudo pm2 reload ecosystem.config.js --env production'
     }
   }
 }
