@@ -7,7 +7,6 @@ const fs = require('fs')
 const clc = require('cli-color')
 const crypto = require('crypto')
 const mariadb = require('mariadb')
-const { log } = require('console')
 const pool = mariadb.createPool({
   host: '192.168.0.100',
   user: 'ev-client',
@@ -29,27 +28,6 @@ app.use(express.static('public'))
 
 app.get('/', (req, res) => {
   res.render('index.ejs')
-})
-
-app.get('/users', (req, res) => {
-  pool.getConnection().then((conn) => {
-    conn
-      .query('SELECT * FROM Players')
-      .then((rows) => {
-        res.render('players.ejs', { players: rows })
-        conn.end()
-      })
-      .catch((err) => {
-        //handle error
-        console.log(err)
-        res.sendStatus(500)
-        conn.end()
-      })
-      .catch((err) => {
-        console.log(err)
-        res.sendStatus(500)
-      })
-  })
 })
 
 app.get('/sessions', (req, res) => {
@@ -209,7 +187,7 @@ app.post('/api/user/', express.json(), (req, res) => {
       .catch((err) => {
         //handle error
         if (err && err.code === 'ER_DUP_ENTRY') {
-          console.log(`${logTimestamp} ${clc.red('Duplicate entry')}`)
+          console.log(`${getLogTimestamp()} ${clc.red('Duplicate entry')}`)
           res.sendStatus(409)
         } else {
           console.log(err)
@@ -237,7 +215,7 @@ app.post('/api/event/', express.json(), (req, res) => {
       .query(`INSERT INTO FeedbackEvents (${columns}) VALUES (?)`, [values])
       .then((rows) => {
         res.sendStatus(201)
-        console.log(`${logTimestamp} ${clc.green(`'${req.body.EventKey}' Event Logged for ${req.body.SessionID}`)}`)
+        console.log(`${getLogTimestamp()} ${clc.green(`'${req.body.EventKey}' Event Logged for ${req.body.SessionID}`)}`)
         io.to(req.body.SessionID).emit('eventTrigger', req.body)
         if (req.body.EventKey.toLowerCase() === 'end') {
           io.to('sessions').emit('sessionEnd', req.body.SessionID)
@@ -250,7 +228,7 @@ app.post('/api/event/', express.json(), (req, res) => {
       .catch((err) => {
         //handle error
         if (err && err.code === 'ER_DUP_ENTRY') {
-          console.log(`${logTimestamp} ${clc.red('Duplicate entry')}`)
+          console.log(`${getLogTimestamp()} ${clc.red('Duplicate entry')}`)
           res.sendStatus(409)
         } else {
           console.log(err)
@@ -272,7 +250,7 @@ app.delete('/api/session/:session', (req, res) => {
       .then((rows) => {
         if (rows) {
           res.sendStatus(200)
-          console.log(`${logTimestamp} ${clc.red(`Session ${req.params.session} Deleted`)}`)
+          console.log(`${getLogTimestamp()} ${clc.red(`Session ${req.params.session} Deleted`)}`)
         } else {
           res.sendStatus(404)
         }
@@ -297,7 +275,7 @@ app.all('*', (req, res) => {
 
 function LogConnections(req, res, next) {
   console.log(
-    `${logTimestamp} ${clc.inverse(req.method)} request for ${clc.underline(req.url)} from ${clc.cyan(
+    `${getLogTimestamp()} ${clc.inverse(req.method)} request for ${clc.underline(req.url)} from ${clc.cyan(
       req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : req.socket.remoteAddress
     )}`
   )
@@ -305,28 +283,29 @@ function LogConnections(req, res, next) {
 }
 
 server.listen(port, () => {
-  console.log(`${clc.green(`${logTimestamp} Listening on port ${port}`)}`)
+  console.log(`${clc.green(`${getLogTimestamp()} Listening on port ${port}`)}`)
 })
 
 io.on('connection', (socket) => {
-  console.log(`${logTimestamp} New Socket Connection ${clc.green(`${socket.id}`)}`)
+  console.log(`${getLogTimestamp()} New Socket Connection ${clc.green(`${socket.id}`)}`)
   const referer = new URL(socket.request.headers.referer)
   const regex = /^\/session\/[A-Z0-9]{5}$/
   if (regex.test(referer.pathname)) {
     socket.join(referer.pathname.slice(-5))
-    console.log(`${logTimestamp} Socket ${clc.green(`${socket.id}`)} Joined ${clc.green(`${referer.pathname.slice(-5)}`)}`)
+    console.log(`${getLogTimestamp()} Socket ${clc.green(`${socket.id}`)} Joined ${clc.green(`${referer.pathname.slice(-5)}`)}`)
   }
   if (referer.pathname === '/sessions' || referer.pathname === '/sessions/') {
     socket.join('sessions')
-    console.log(`${logTimestamp} Socket ${clc.green(`${socket.id}`)} Joined ${clc.green(`sessions`)}`)
+    console.log(`${getLogTimestamp()} Socket ${clc.green(`${socket.id}`)} Joined ${clc.green(`sessions`)}`)
   }
   socket.on('disconnect', () => {
-    console.log(`${logTimestamp} ${clc.red(`Socket Disconnected ${socket.id}`)}`)
+    console.log(`${getLogTimestamp()} ${clc.red(`Socket Disconnected ${socket.id}`)}`)
   })
 })
 
-var date = new Date(),
-  logTimestamp =
+function getLogTimestamp() {
+  let date = new Date()
+  let timeStamp =
     ('00' + (date.getMonth() + 1)).slice(-2) +
     '/' +
     ('00' + date.getDate()).slice(-2) +
@@ -338,6 +317,8 @@ var date = new Date(),
     ('00' + date.getMinutes()).slice(-2) +
     ':' +
     ('00' + date.getSeconds()).slice(-2)
+  return timeStamp
+}
 
 function makeID(length) {
   let result = ''
